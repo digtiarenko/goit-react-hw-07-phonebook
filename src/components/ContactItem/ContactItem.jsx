@@ -1,8 +1,11 @@
 import styles from './ContactItem.module.css';
-
+import { useDispatch } from 'react-redux';
+import { deleteContact } from '../../redux/actions';
 import PropTypes from 'prop-types';
 
-const ContactItem = ({ id, number, name, onDeleteContact }) => {
+const ContactItem = ({ id, number, name }) => {
+  const dispatch = useDispatch();
+
   return (
     <li key={id} className={styles.listUnit}>
       <span className={styles.span}>
@@ -10,7 +13,7 @@ const ContactItem = ({ id, number, name, onDeleteContact }) => {
       </span>
       <button
         onClick={() => {
-          onDeleteContact(id);
+          dispatch(deleteContact(id)); ///!!!
         }}
         type="button"
       >
@@ -24,7 +27,6 @@ ContactItem.propTypes = {
   id: PropTypes.string.isRequired,
   number: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  onDeleteContact: PropTypes.func.isRequired,
 };
 
 export default ContactItem;
