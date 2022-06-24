@@ -1,46 +1,21 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { configureStore, createReducer, createAction } from '@reduxjs/toolkit';
+import { contactsApi } from './contactsSlice.js';
 
-import storage from 'redux-persist/lib/storage';
-import contactsReducer from './reducers';
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from 'redux-persist';
+export const changeFilter = createAction('contact/changeFilter');
 
-const contactsPersistConfig = {
-  key: 'contacts',
-  storage,
-  blacklist: ['filter'],
-};
-
-const persistedReducer = persistReducer(contactsPersistConfig, contactsReducer);
-
-const rootReducer = combineReducers({
-  contacts: persistedReducer,
+const filterReducer = createReducer('', {
+  [changeFilter]: (_, { payload }) => payload,
 });
 
-const store = configureStore({
-  reducer: rootReducer,
+export const store = configureStore({
+  reducer: {
+    [contactsApi.reducerPath]: contactsApi.reducer,
+    filter: filterReducer,
+  },
   devTools: process.env.NODE_ENV === 'development',
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+
+  middleware: getDefaultMiddleware => [
+    ...getDefaultMiddleware(),
+    contactsApi.middleware,
+  ],
 });
-
-const persistor = persistStore(store);
-
-const exportedObject = {
-  store,
-  persistor,
-};
-
-export default exportedObject;

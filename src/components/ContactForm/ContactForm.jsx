@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { createContact } from '../../redux/actions';
-import { nanoid } from 'nanoid';
-
+import {
+  useGetContactsQuery,
+  useAddContactMutation,
+} from '../../redux/contactsSlice';
 import styles from './ContactForm.module.css';
 
 export default function ContactForm() {
+  const [addContact, { isLoading }] = useAddContactMutation();
+  const { data: contacts } = useGetContactsQuery();
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const dispatch = useDispatch();
-  const contactList = useSelector(state => state.contacts.items);
+  const [phone, setPhone] = useState('');
 
   const handleNameInput = event => {
     const { value } = event.target;
@@ -17,25 +17,27 @@ export default function ContactForm() {
   };
   const handleNumberInput = event => {
     const { value } = event.target;
-    setNumber(value);
+    setPhone(value);
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault();
 
-    if (contactList.find(contact => contact.name === name)) {
+    if (contacts.find(contact => contact.name === name)) {
       alert(`${name} is already here`);
       return;
     }
+
     const newContact = {
-      id: nanoid(),
+      // id: nanoid(),
       name,
-      number,
+      phone,
     };
 
-    dispatch(createContact(newContact));
+    await addContact(newContact);
+
     setName('');
-    setNumber('');
+    setPhone('');
   };
 
   return (
@@ -59,7 +61,7 @@ export default function ContactForm() {
           <input
             className={styles.input}
             onChange={handleNumberInput}
-            value={number}
+            value={phone}
             type="tel"
             name="number"
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
@@ -68,7 +70,7 @@ export default function ContactForm() {
           />
         </label>
 
-        <button className={styles.btn} type="submit">
+        <button className={styles.btn} disabled={isLoading} type="submit">
           {' '}
           Add contact
         </button>

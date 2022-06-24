@@ -1,11 +1,10 @@
-// import ContactList from 'components/ContactList';
 import { useDispatch, useSelector } from 'react-redux';
 import styles from '../ContactForm/ContactForm.module.css';
-import { changeFilter } from '../../redux/actions';
+import { changeFilter } from '../../redux/store';
 
 export default function Filter() {
   const dispatch = useDispatch();
-  const filterValue = useSelector(state => state.contacts.filter);
+  const filterValue = useSelector(state => state.filter);
 
   const onChangeFilter = event => {
     const { value } = event.target;
@@ -30,8 +29,3 @@ export default function Filter() {
     </div>
   );
 }
-
-// Filter.propTypes = {
-//   onChange: PropTypes.func.isRequired,
-//   value: PropTypes.string,
-// };
